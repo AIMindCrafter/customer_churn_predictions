@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  # ── MLflow Tracking Server ────────────────────────────────
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.16.0
+    container_name: mlflow-server
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    restart: unless-stopped
+
+  # ── Churn Prediction API ──────────────────────────────────
+  churn-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churn-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.example
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MODELS_DIR=/app/artifacts
+      - PREDICTION_LOG_PATH=/app/artifacts/prediction_log.jsonl
+    volumes:
+      - ./artifacts:/app/artifacts
+    depends_on:
+      - mlflow
+    restart: unless-stopped
+
+volumes:
+  mlflow_data:

@@ -1,0 +1,49 @@
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Model Artifacts ─────────────────────────────────────
+artifacts/
+*.pkl
+!requirements*.txt
+
+# ── MLflow ──────────────────────────────────────────────
+mlruns/
+mlartifacts/
+
+# ── Environment ────────────────────────────────────────
+.env
+.venv/
+venv/
+env/
+
+# ── IDE ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Outputs ─────────────────────────────────────────────
+*.csv
+!WA_Fn-UseC_-Telco-Customer-Churn.csv
+predictions_*.csv
+
+# ── DVC ─────────────────────────────────────────────────
+/dvc.lock
+/dvc.yaml
+
+# ── Coverage ────────────────────────────────────────────
+.coverage
+coverage.xml
+htmlcov/
+
+# ── Docker ──────────────────────────────────────────────
+*.log

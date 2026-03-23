@@ -1,0 +1,112 @@
+"""
+CHURN PREDICTION PROJECT - PRODUCTION READY STRUCTURE
+
+Directory Layout:
+─────────────────
+
+churn_prediction/
+│
+├── src/                               # Python package with core modules
+│   ├── __init__.py                   # Package initialization
+│   ├── config.py                     # Configuration constants & settings
+│   ├── data_loader.py                # Load CSV, prepare features
+│   ├── preprocessing.py              # Outlier removal, SMOTE, scaling
+│   ├── models.py                     # GridSearch & Bayesian hyperparameter tuning
+│   ├── evaluation.py                 # Metrics, confusion matrix, ROC curves
+│   ├── explainability.py             # SHAP feature importance analysis
+│   └── utils.py                      # Helper functions
+│
+├── scripts/                           # Executable scripts
+│   ├── run.sh                        # Shell script to run complete pipeline
+│   └── predict.py                    # Inference script for new data
+│
+├── main.py                           # Complete pipeline orchestration
+├── train.ipynb                       # Minimal Jupyter notebook interface
+├── requirements_prod.txt             # Python dependencies
+├── .gitignore                        # Git ignore patterns
+└── README.md                         # Project documentation
+
+Key Features:
+─────────────
+
+✅ MODULAR DESIGN
+   - Each module has single responsibility
+   - Clean separation of concerns
+   - Easy to extend and test
+
+✅ PRODUCTION READY
+   - Proper configuration management
+   - Model serialization (pickle)
+   - Error handling & logging
+   - Deployment-ready code
+
+✅ MINIMAL CODE
+   - No redundant logic
+   - DRY principles followed
+   - Focused, readable functions
+
+✅ COMPREHENSIVE ANALYSIS
+   - Hyperparameter tuning (GridSearch vs Bayesian)
+   - Model comparison & evaluation
+   - SHAP explainability
+   - ROC curves & confusion matrices
+
+How to Use:
+───────────
+
+1) SETUP
+   $ pip install -r requirements_prod.txt
+
+2) RUN COMPLETE PIPELINE
+   $ python main.py
+   OR
+   $ bash scripts/run.sh
+   OR
+   $ jupyter notebook train.ipynb
+
+3) MAKE PREDICTIONS
+   $ python scripts/predict.py --data new_data.csv --model bayesian
+
+4) ACCESS TRAINED MODELS
+   - best_model_gridsearch_rf.pkl
+   - best_model_bayesian_rf.pkl
+   - scaler.pkl
+   - best_params_gridsearch.pkl
+   - best_params_bayesian.pkl
+
+Module Responsibilities:
+───────────────────────
+
+config.py
+  └─ Store all constants and settings in one place
+
+data_loader.py
+  └─ Load data, encode categoricals, split train/test
+
+preprocessing.py
+  └─ Clean data, balance classes, scale features
+
+models.py
+  └─ Train models, tune hyperparameters, save/load
+
+evaluation.py
+  └─ Calculate metrics, create visualizations
+
+explainability.py
+  └─ Generate SHAP values, plot interpretability
+
+utils.py
+  └─ Reusable utility functions
+
+Production Standards:
+────────────────────
+
+✓ No data leakage (SMOTE only on training data)
+✓ Reproducible (fixed random seeds)
+✓ Configurable (all constants in config.py)
+✓ Testable (pure functions with clear inputs/outputs)
+✓ Documentable (docstrings on all functions)
+✓ Deployable (models saved as portable pickle files)
+✓ Explainable (SHAP analysis built-in)
+
+"""
