@@ -3,11 +3,10 @@
 import os
 import sys
 import json
-import tempfile
 import pytest
 import pandas as pd
 import numpy as np
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 # Ensure project root is on path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -19,7 +18,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 class TestConfig:
     def test_config_imports(self):
-        from src.config import RANDOM_STATE, TEST_SIZE, MLFLOW_EXPERIMENT_NAME
+        from src.config import RANDOM_STATE, TEST_SIZE
         assert RANDOM_STATE == 42
         assert 0 < TEST_SIZE < 1
 

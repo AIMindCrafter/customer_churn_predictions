@@ -17,7 +17,8 @@ def _import_shap():
         import shap
         return shap
     except ImportError:
-        import subprocess, sys
+        import subprocess
+        import sys
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'shap', '-q'])
         import shap
         return shap

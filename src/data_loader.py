@@ -1,7 +1,6 @@
 """Data loading and basic preparation"""
 
 import pandas as pd
-import numpy as np
 from src.config import DATA_PATH, RANDOM_STATE, TEST_SIZE
 from src.logger import get_logger
 
