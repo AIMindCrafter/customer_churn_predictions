@@ -1,7 +1,6 @@
 """Main orchestration script for Churn Prediction Pipeline"""
 
 import os
-import sys
 from src.utils import print_section
 from src.logger import get_logger
 from src.data_loader import load_data, prepare_features, split_data

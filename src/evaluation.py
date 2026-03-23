@@ -1,7 +1,6 @@
 """Model evaluation and metrics"""
 
 import pandas as pd
-import numpy as np
 from sklearn.metrics import (accuracy_score, precision_score, recall_score,
                              f1_score, roc_auc_score, confusion_matrix, roc_curve)
 import matplotlib

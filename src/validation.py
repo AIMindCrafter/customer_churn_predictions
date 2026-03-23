@@ -1,7 +1,6 @@
 """Data validation schemas and checks for training and inference data."""
 
 import pandas as pd
-import numpy as np
 from src.logger import get_logger
 
 logger = get_logger(__name__)
