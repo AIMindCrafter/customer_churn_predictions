@@ -1,6 +1,6 @@
-# Churn Prediction — Production MLOps
+# ChurnGuard — Production MLOps Customer Churn Prediction
 
-A professional, modular ML pipeline for customer churn prediction with full MLOps: MLflow experiment tracking & model registry, CI/CD, data validation, drift detection, Docker deployment, and a production UI.
+A professional, production-grade ML pipeline for customer churn prediction with full MLOps: model preloading, batch predictions, AI-driven retention recommendations, real-time dashboard, MLflow tracking, CI/CD, Docker deployment, and data drift detection.
 
 ## 📁 Project Structure
 
@@ -18,25 +18,26 @@ churn_prediction/
 │   ├── validation.py                  # Data schema validation
 │   ├── monitoring.py                  # Prediction logging (JSONL)
 │   ├── drift.py                       # Statistical drift detection
-│   ├── api.py                         # FastAPI inference service
+│   ├── api.py                         # FastAPI inference service (v3.0)
 │   └── utils.py                       # Helpers
 ├── scripts/
 │   ├── train_pipeline.py              # CLI training with MLflow registration
 │   ├── predict.py                     # Batch inference script
 │   ├── check_drift.py                 # Drift detection CLI
-│   └── run.sh                         # Quick pipeline runner
+│   └── run.sh                         # Quick start (auto-train + serve)
 ├── tests/
 │   └── test_pipeline.py               # Pytest test suite
 ├── frontend/
-│   ├── index.html                     # Dashboard UI
+│   ├── index.html                     # Premium glassmorphism dashboard
 │   ├── styles.css                     # Dark-mode design system
-│   └── app.js                         # Client-side logic
+│   └── app.js                         # Client-side logic + batch CSV
 ├── .github/workflows/
 │   └── ci.yml                         # GitHub Actions CI/CD
 ├── main.py                            # Pipeline orchestration
 ├── Dockerfile                         # Container build (with healthcheck)
 ├── docker-compose.yml                 # API + MLflow server
 ├── requirements.txt                   # All dependencies
+├── .env                               # Environment variables
 ├── .env.example                       # Environment variables template
 ├── .gitignore
 └── .dvcignore                         # DVC data tracking config
@@ -45,15 +46,31 @@ churn_prediction/
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 pip install -r requirements.txt
 
-# Run complete training pipeline
-python main.py
+# 2. Train models + Start server (auto-detects if training needed)
+bash scripts/run.sh
 
-# Or use the CLI with options
-python scripts/train_pipeline.py --register --skip-shap
+# Or manually:
+python scripts/train_pipeline.py --skip-shap   # Train (~5 min)
+python -m uvicorn src.api:app --reload          # Start server
 ```
+
+Open **http://localhost:8000** to access the dashboard.
+
+## 🖥️ Dashboard Features
+
+| Feature | Description |
+|---------|-------------|
+| **Single Prediction** | Fill customer profile form, click predict |
+| **Batch CSV Upload** | Upload CSV file for multi-customer predictions |
+| **Risk Gauge** | Animated circular gauge showing churn probability |
+| **Retention Recommendations** | AI-generated strategies to reduce churn |
+| **Live Stats** | Real-time prediction counters and churn rate |
+| **Model Info** | View loaded model metadata |
+| **Prediction History** | Session-persistent history with clear option |
+| **Export CSV** | Download batch results as CSV |
 
 ## 🐳 Docker Deployment (API + MLflow Server)
 
@@ -70,11 +87,14 @@ docker compose up --build
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/health` | Health check with version + timestamp |
+| `GET` | `/health` | Health check with model status + uptime |
 | `GET` | `/metrics` | Prometheus-compatible metrics |
 | `GET` | `/` | Frontend dashboard |
-| `POST` | `/predict` | Single/batch prediction |
+| `GET` | `/api/stats` | Prediction statistics for dashboard |
+| `GET` | `/api/model-info` | Model metadata |
+| `POST` | `/predict` | Single/batch prediction with recommendations |
 | `POST` | `/v1/predict` | Versioned prediction endpoint |
+| `POST` | `/reload-models` | Hot-reload models without restart |
 
 ### Test prediction
 
@@ -116,49 +136,19 @@ mlflow ui --port 5000
 docker compose up mlflow
 ```
 
-**Features:**
-- Automatic experiment logging (params, metrics, models)
-- Model Registry with staging/production stages
-- Plot artifacts (confusion matrix, ROC curves)
-- Git commit hash tracking
-
 ## 🔍 Data Drift Detection
 
 ```bash
 # Check drift against training data reference
 python scripts/check_drift.py --n-recent 200 --threshold 2.0
-
-# Save report
-python scripts/check_drift.py --output drift_report.json
-```
-
-## 🏗️ MLOps Architecture
-
-```
-┌─────────────────────────────────────────────────┐
-│                   CI/CD Pipeline                 │
-│  Lint → Test → Build Docker → Deploy             │
-├─────────────────────────────────────────────────┤
-│                                                   │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐   │
-│  │  Data     │───▶│ Training │───▶│ MLflow   │   │
-│  │ Validation│    │ Pipeline │    │ Registry │   │
-│  └──────────┘    └──────────┘    └──────────┘   │
-│                                       │           │
-│                                       ▼           │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐   │
-│  │  Drift   │◀───│Prediction│◀───│ FastAPI  │   │
-│  │Detection │    │ Logging  │    │  Server  │   │
-│  └──────────┘    └──────────┘    └──────────┘   │
-│                                                   │
-├─────────────────────────────────────────────────┤
-│              Monitoring & Metrics                 │
-│  /metrics endpoint · Prediction logs · Alerts     │
-└─────────────────────────────────────────────────┘
 ```
 
 ## ✅ Production Standards
 
+- **Model Preloading** — Models loaded once at startup, cached in memory
+- **CORS Enabled** — Cross-origin access for decoupled frontends
+- **Retention Recommendations** — AI-generated strategies for at-risk customers
+- **Batch Predictions** — CSV upload for bulk processing
 - **Structured Logging** — JSON-formatted logs for aggregation tools
 - **Data Validation** — Schema checks for training and inference data
 - **MLflow Integration** — Experiment tracking, model registry, artifact storage
@@ -167,18 +157,8 @@ python scripts/check_drift.py --output drift_report.json
 - **Prometheus Metrics** — `/metrics` endpoint for monitoring
 - **CI/CD** — GitHub Actions with lint, test, Docker build
 - **Docker** — Multi-service compose with healthchecks
-- **No Data Leakage** — SMOTE only on training data
-- **Reproducibility** — Fixed seeds, git hash tracking
-- **SHAP Explainability** — Built-in feature importance analysis
-
-## 📝 Environment Variables
-
-See `.env.example` for all configurable settings including:
-- `MLFLOW_TRACKING_URI` — MLflow server URL
-- `MODELS_DIR` — Model artifact directory
-- `LOG_LEVEL` / `LOG_JSON` — Logging configuration
-- `DATA_PATH` — Training data location
+- **Hot Reload** — Reload models without server restart
 
 ---
 
-**Status**: ✅ Production Ready | **Version**: 2.0.0
+**Status**: ✅ Production Ready | **Version**: 3.0.0

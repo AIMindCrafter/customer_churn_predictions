@@ -1,27 +1,58 @@
 #!/bin/bash
-# Run the complete churn prediction pipeline
+# ═══════════════════════════════════════════════════════
+# ChurnGuard — Quick Start Script
+# ═══════════════════════════════════════════════════════
 
-echo "================================"
-echo "Churn Prediction Pipeline"
-echo "================================"
+set -e
 
-cd "$(dirname "$0")/.."
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$PROJECT_DIR"
 
-# Check if Python is available
-if ! command -v python3 &> /dev/null; then
-    echo "Error: Python 3 is not installed"
-    exit 1
+echo "⚡ ChurnGuard — Production Churn Prediction"
+echo "════════════════════════════════════════════"
+
+# ── Virtual environment setup ─────────────────────────
+VENV_DIR="$PROJECT_DIR/venv"
+if [ ! -d "$VENV_DIR" ]; then
+    echo "📦 Creating virtual environment..."
+    python3 -m venv "$VENV_DIR"
+    echo "✅ Virtual environment created at $VENV_DIR"
 fi
 
-# Check if requirements are installed
-echo "Checking dependencies..."
-python3 -c "import pandas, sklearn, shap" 2>/dev/null
-if [ $? -ne 0 ]; then
-    echo "Installing dependencies..."
-    pip install -r requirements_prod.txt
+# Activate venv
+source "$VENV_DIR/bin/activate"
+echo "✅ Virtual environment activated"
+
+# Install dependencies if needed
+if ! python3 -c "import fastapi" 2>/dev/null; then
+    echo "📥 Installing dependencies..."
+    pip install -r requirements.txt
+    echo "✅ Dependencies installed"
 fi
 
-# Run pipeline
+# Load environment variables
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+    echo "✅ Environment loaded from .env"
+fi
+
+# Check if model artifacts exist
+if [ ! -f "./artifacts/best_model_bayesian_rf.pkl" ]; then
+    echo ""
+    echo "⚠️  Model artifacts not found. Training models..."
+    echo "   This will take 5-10 minutes."
+    echo ""
+    python3 scripts/train_pipeline.py --skip-shap
+    echo ""
+    echo "✅ Training complete!"
+fi
+
 echo ""
-echo "Running pipeline..."
-python3 main.py
+echo "🚀 Starting API server on http://localhost:${APP_PORT:-8000}"
+echo "   Press Ctrl+C to stop"
+echo ""
+
+python3 -m uvicorn src.api:app \
+    --host "${APP_HOST:-0.0.0.0}" \
+    --port "${APP_PORT:-8000}" \
+    --reload

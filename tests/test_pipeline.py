@@ -225,7 +225,10 @@ class TestAPI:
         client = TestClient(app)
         response = client.get("/health")
         assert response.status_code == 200
-        assert response.json()["status"] == "ok"
+        data = response.json()
+        assert data["status"] == "ok"
+        assert "models_loaded" in data
+        assert "uptime_seconds" in data
 
     def test_metrics_endpoint(self):
         from src.api import app
@@ -234,6 +237,31 @@ class TestAPI:
         response = client.get("/metrics")
         assert response.status_code == 200
         assert "prediction_requests_total" in response.text
+
+    def test_stats_endpoint(self):
+        from src.api import app
+        from fastapi.testclient import TestClient
+        client = TestClient(app)
+        response = client.get("/api/stats")
+        assert response.status_code == 200
+        data = response.json()
+        assert "total_predictions" in data
+        assert "churn_rate" in data
+
+    def test_model_info_endpoint(self):
+        from src.api import app
+        from fastapi.testclient import TestClient
+        client = TestClient(app)
+        response = client.get("/api/model-info")
+        assert response.status_code == 200
+
+    def test_reload_models_endpoint(self):
+        from src.api import app
+        from fastapi.testclient import TestClient
+        client = TestClient(app)
+        response = client.post("/reload-models")
+        assert response.status_code == 200
+        assert "models_loaded" in response.json()
 
 
 # ═══════════════════════════════════════════════════════════

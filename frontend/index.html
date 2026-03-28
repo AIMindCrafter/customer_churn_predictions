@@ -1,148 +1,334 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AI-powered customer churn prediction with real-time analysis and risk scoring" />
-  <title>Churn Prediction — AI Dashboard</title>
+  <meta name="description"
+    content="AI-powered customer churn prediction with real-time analysis, risk scoring, and retention recommendations" />
+  <meta name="theme-color" content="#0d1117" />
+  <title>ChurnGuard — AI Churn Prediction Dashboard</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>⚡</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="/frontend/styles.css" />
 </head>
+
 <body>
-  <!-- ── Header ────────────────────────────────────────── -->
-  <header class="top-bar">
+  <!-- ── Ambient Background ───────────────────────────── -->
+  <div class="ambient-bg">
+    <div class="ambient-orb ambient-orb--1"></div>
+    <div class="ambient-orb ambient-orb--2"></div>
+    <div class="ambient-orb ambient-orb--3"></div>
+  </div>
+
+  <!-- ── Header ───────────────────────────────────────── -->
+  <header class="top-bar" id="top-bar">
     <div class="top-bar__brand">
-      <span class="top-bar__icon">⚡</span>
-      <h1 class="top-bar__title">Churn Predictor</h1>
-      <span class="top-bar__badge">v2.0</span>
+      <div class="logo-glow">
+        <span class="logo-icon">⚡</span>
+      </div>
+      <div>
+        <h1 class="top-bar__title">ChurnGuard</h1>
+        <span class="top-bar__subtitle">AI-Powered Retention Intelligence</span>
+      </div>
+      <span class="top-bar__badge">v3.0</span>
     </div>
-    <div class="top-bar__status">
-      <span class="status-dot"></span>
-      <span id="api-status">Connecting…</span>
+    <div class="top-bar__right">
+      <div class="top-bar__status">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="api-status">Connecting…</span>
+      </div>
     </div>
   </header>
 
+  <!-- ── Stats Bar ────────────────────────────────────── -->
+  <section class="stats-bar" id="stats-bar">
+    <div class="stat-card">
+      <div class="stat-card__icon">📊</div>
+      <div class="stat-card__content">
+        <span class="stat-card__value" id="stat-total">0</span>
+        <span class="stat-card__label">Total Predictions</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__icon">⚠️</div>
+      <div class="stat-card__content">
+        <span class="stat-card__value stat-danger" id="stat-churn">0</span>
+        <span class="stat-card__label">Churn Detected</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__icon">✅</div>
+      <div class="stat-card__content">
+        <span class="stat-card__value stat-success" id="stat-stay">0</span>
+        <span class="stat-card__label">Retained</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__icon">📈</div>
+      <div class="stat-card__content">
+        <span class="stat-card__value" id="stat-rate">0%</span>
+        <span class="stat-card__label">Churn Rate</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__icon">⚙️</div>
+      <div class="stat-card__content">
+        <span class="stat-card__value" id="stat-latency">0ms</span>
+        <span class="stat-card__label">Avg Latency</span>
+      </div>
+    </div>
+  </section>
+
   <main class="dashboard">
-    <!-- ── Left Column: Input Form ─────────────────────── -->
-    <section class="panel form-panel" id="form-panel">
-      <h2 class="panel__heading">Customer Profile</h2>
-      <form id="predict-form" autocomplete="off">
-        <!-- Account -->
-        <fieldset class="field-group">
-          <legend>Account Info</legend>
-          <div class="field-grid">
-            <div class="field">
-              <label for="tenure">Tenure (months)</label>
-              <input type="number" id="tenure" value="12" min="0" max="120" required />
-            </div>
-            <div class="field">
-              <label for="monthly">Monthly Charges ($)</label>
-              <input type="number" id="monthly" value="70.50" step="0.01" min="0" required />
-            </div>
-            <div class="field">
-              <label for="total">Total Charges ($)</label>
-              <input type="number" id="total" value="846.00" step="0.01" min="0" required />
-            </div>
-            <div class="field">
-              <label for="senior">Senior Citizen</label>
-              <select id="senior">
-                <option value="0" selected>No</option>
-                <option value="1">Yes</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="partner">Partner</label>
-              <select id="partner"><option>Yes</option><option selected>No</option></select>
-            </div>
-            <div class="field">
-              <label for="dependents">Dependents</label>
-              <select id="dependents"><option selected>No</option><option>Yes</option></select>
-            </div>
-          </div>
-        </fieldset>
+    <!-- ── Left Column: Input ─────────────────────────── -->
+    <div class="left-col">
+      <!-- Tab Switcher -->
+      <div class="tab-switcher" id="tab-switcher">
+        <button class="tab-btn active" data-tab="single" id="tab-single">
+          <span class="tab-icon">👤</span> Single Prediction
+        </button>
+        <button class="tab-btn" data-tab="batch" id="tab-batch">
+          <span class="tab-icon">📁</span> Batch Upload
+        </button>
+      </div>
 
-        <!-- Services -->
-        <fieldset class="field-group">
-          <legend>Services</legend>
-          <div class="field-grid">
-            <div class="field">
-              <label for="internet">Internet Service</label>
-              <select id="internet"><option selected>Fiber optic</option><option>DSL</option><option>No</option></select>
+      <!-- Single Prediction Form -->
+      <section class="panel glass-panel form-panel" id="single-panel">
+        <h2 class="panel__heading"><span class="heading-dot"></span>Customer Profile</h2>
+        <form id="predict-form" autocomplete="off">
+          <!-- Account -->
+          <fieldset class="field-group">
+            <legend>Account Info</legend>
+            <div class="field-grid">
+              <div class="field">
+                <label for="tenure">Tenure (months)
+                  <input type="number" id="tenure" value="12" min="0" max="120" required />
+                </label>
+              </div>
+              <div class="field">
+                <label for="monthly">Monthly Charges ($)
+                  <input type="number" id="monthly" value="70.50" step="0.01" min="0" required />
+                </label>
+              </div>
+              <div class="field">
+                <label for="total">Total Charges ($)
+                  <input type="number" id="total" value="846.00" step="0.01" min="0" required />
+                </label>
+              </div>
+              <div class="field">
+                <label for="senior">Senior Citizen
+                  <select id="senior">
+                    <option value="0" selected>No</option>
+                    <option value="1">Yes</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="partner">Partner
+                  <select id="partner">
+                    <option>Yes</option>
+                    <option selected>No</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="dependents">Dependents
+                  <select id="dependents">
+                    <option selected>No</option>
+                    <option>Yes</option>
+                  </select>
+                </label>
+              </div>
             </div>
-            <div class="field">
-              <label for="multilines">Multiple Lines</label>
-              <select id="multilines"><option selected>No phone service</option><option>No</option><option>Yes</option></select>
-            </div>
-            <div class="field">
-              <label for="security">Online Security</label>
-              <select id="security"><option selected>No</option><option>Yes</option><option>No internet service</option></select>
-            </div>
-            <div class="field">
-              <label for="backup">Online Backup</label>
-              <select id="backup"><option selected>No</option><option>Yes</option><option>No internet service</option></select>
-            </div>
-            <div class="field">
-              <label for="protection">Device Protection</label>
-              <select id="protection"><option selected>No</option><option>Yes</option><option>No internet service</option></select>
-            </div>
-            <div class="field">
-              <label for="techsupport">Tech Support</label>
-              <select id="techsupport"><option selected>No</option><option>Yes</option><option>No internet service</option></select>
-            </div>
-            <div class="field">
-              <label for="tv">Streaming TV</label>
-              <select id="tv"><option selected>Yes</option><option>No</option><option>No internet service</option></select>
-            </div>
-            <div class="field">
-              <label for="movies">Streaming Movies</label>
-              <select id="movies"><option selected>Yes</option><option>No</option><option>No internet service</option></select>
-            </div>
-          </div>
-        </fieldset>
+          </fieldset>
 
-        <!-- Billing -->
-        <fieldset class="field-group">
-          <legend>Billing</legend>
-          <div class="field-grid">
-            <div class="field">
-              <label for="contract">Contract</label>
-              <select id="contract"><option selected>Month-to-month</option><option>One year</option><option>Two year</option></select>
+          <!-- Services -->
+          <fieldset class="field-group">
+            <legend>Services</legend>
+            <div class="field-grid">
+              <div class="field">
+                <label for="internet">Internet Service
+                  <select id="internet">
+                    <option selected>Fiber optic</option>
+                    <option>DSL</option>
+                    <option>No</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="multilines">Multiple Lines
+                  <select id="multilines">
+                    <option selected>No phone service</option>
+                    <option>No</option>
+                    <option>Yes</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="security">Online Security
+                  <select id="security">
+                    <option selected>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="backup">Online Backup
+                  <select id="backup">
+                    <option selected>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="protection">Device Protection
+                  <select id="protection">
+                    <option selected>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="techsupport">Tech Support
+                  <select id="techsupport">
+                    <option selected>No</option>
+                    <option>Yes</option>
+                    <option>No internet service</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="tv">Streaming TV
+                  <select id="tv">
+                    <option selected>Yes</option>
+                    <option>No</option>
+                    <option>No internet service</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="movies">Streaming Movies
+                  <select id="movies">
+                    <option selected>Yes</option>
+                    <option>No</option>
+                    <option>No internet service</option>
+                  </select>
+                </label>
+              </div>
             </div>
-            <div class="field">
-              <label for="paperless">Paperless Billing</label>
-              <select id="paperless"><option selected>Yes</option><option>No</option></select>
+          </fieldset>
+
+          <!-- Billing -->
+          <fieldset class="field-group">
+            <legend>Billing & Model</legend>
+            <div class="field-grid">
+              <div class="field">
+                <label for="contract">Contract
+                  <select id="contract">
+                    <option selected>Month-to-month</option>
+                    <option>One year</option>
+                    <option>Two year</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="paperless">Paperless Billing
+                  <select id="paperless">
+                    <option selected>Yes</option>
+                    <option>No</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="payment">Payment Method
+                  <select id="payment">
+                    <option selected>Electronic check</option>
+                    <option>Mailed check</option>
+                    <option>Bank transfer (automatic)</option>
+                    <option>Credit card (automatic)</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field">
+                <label for="modelType">AI Model
+                  <select id="modelType">
+                    <option value="bayesian" selected>Bayesian RF</option>
+                    <option value="grid">GridSearch RF</option>
+                  </select>
+                </label>
+              </div>
             </div>
-            <div class="field">
-              <label for="payment">Payment Method</label>
-              <select id="payment">
-                <option selected>Electronic check</option>
-                <option>Mailed check</option>
-                <option>Bank transfer (automatic)</option>
-                <option>Credit card (automatic)</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="modelType">Model</label>
-              <select id="modelType">
+          </fieldset>
+
+          <button id="submitBtn" type="submit" class="btn-primary">
+            <span class="btn-icon">🔮</span>
+            <span class="btn-text">Predict Churn</span>
+            <span class="btn-shimmer"></span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Batch Upload Panel -->
+      <section class="panel glass-panel batch-panel" id="batch-panel" hidden>
+        <h2 class="panel__heading"><span class="heading-dot"></span>Batch CSV Prediction</h2>
+        <p class="batch-desc">Upload a CSV file with customer records to predict churn for multiple customers at once.
+        </p>
+
+        <div class="csv-dropzone" id="csv-dropzone">
+          <div class="dropzone-icon">📄</div>
+          <p class="dropzone-text">Drag & drop CSV file here</p>
+          <p class="dropzone-subtext">or click to browse</p>
+          <input type="file" id="csv-input" accept=".csv" hidden />
+        </div>
+
+        <div class="csv-preview" id="csv-preview" hidden>
+          <div class="csv-preview__header">
+            <span id="csv-filename">file.csv</span>
+            <span id="csv-rowcount">0 records</span>
+            <button class="btn-clear" id="csv-clear">✕ Clear</button>
+          </div>
+          <div class="csv-table-wrap" id="csv-table-wrap"></div>
+        </div>
+
+        <div class="batch-controls" id="batch-controls" hidden>
+          <div class="field" style="flex:1;">
+            <label for="batchModelType">AI Model
+              <select id="batchModelType">
                 <option value="bayesian" selected>Bayesian RF</option>
                 <option value="grid">GridSearch RF</option>
               </select>
-            </div>
+            </label>
           </div>
-        </fieldset>
+          <button id="batchSubmitBtn" class="btn-primary" type="button">
+            <span class="btn-icon">🚀</span>
+            <span class="btn-text">Run Batch Prediction</span>
+            <span class="btn-shimmer"></span>
+          </button>
+        </div>
 
-        <button id="submitBtn" type="submit" class="btn-primary">
-          <span class="btn-icon">🔮</span> Predict Churn
-        </button>
-      </form>
-    </section>
+        <div class="batch-results" id="batch-results" hidden>
+          <h3 class="batch-results__title">Batch Results</h3>
+          <div class="batch-summary" id="batch-summary"></div>
+          <div class="batch-table-wrap" id="batch-table-wrap"></div>
+          <button class="btn-secondary" id="export-btn">
+            <span>📥</span> Export Results CSV
+          </button>
+        </div>
+      </section>
+    </div>
 
-    <!-- ── Right Column: Results ───────────────────────── -->
-    <aside class="panel results-panel">
+    <!-- ── Right Column: Results ──────────────────────── -->
+    <aside class="right-col">
       <!-- Result Card -->
-      <div class="result-card" id="result-card" hidden>
+      <div class="panel glass-panel result-card" id="result-card" hidden>
         <div class="result-card__header">
           <h2>Prediction Result</h2>
           <span class="result-card__model" id="result-model"></span>
@@ -150,6 +336,12 @@
         <div class="result-card__body">
           <div class="risk-gauge" id="risk-gauge">
             <svg viewBox="0 0 120 120" class="risk-gauge__svg">
+              <defs>
+                <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color: var(--accent)" />
+                  <stop offset="100%" style="stop-color: var(--accent-secondary)" />
+                </linearGradient>
+              </defs>
               <circle cx="60" cy="60" r="52" class="gauge-bg" />
               <circle cx="60" cy="60" r="52" class="gauge-fill" id="gauge-fill" />
             </svg>
@@ -169,11 +361,21 @@
         </div>
       </div>
 
+      <!-- Recommendations Card -->
+      <div class="panel glass-panel recs-card" id="recs-card" hidden>
+        <h3 class="recs-card__title">💡 Retention Recommendations</h3>
+        <ul class="recs-list" id="recs-list"></ul>
+      </div>
+
       <!-- Empty state -->
-      <div class="empty-state" id="empty-state">
-        <div class="empty-state__icon">📊</div>
-        <h3>No Predictions Yet</h3>
-        <p>Fill in customer details and click <strong>Predict Churn</strong> to see results.</p>
+      <div class="panel glass-panel empty-state" id="empty-state">
+        <div class="empty-state__icon">
+          <div class="pulse-ring"></div>
+          📊
+        </div>
+        <h3>Ready to Predict</h3>
+        <p>Fill in customer details and click <strong>Predict Churn</strong> to see AI-powered results with retention
+          recommendations.</p>
       </div>
 
       <!-- Error Card -->
@@ -183,21 +385,33 @@
       </div>
 
       <!-- Prediction History -->
-      <div class="history-section">
-        <h3 class="history-section__title">Prediction History</h3>
+      <div class="panel glass-panel history-section">
+        <h3 class="history-section__title">
+          <span>📋</span> Recent Predictions
+          <button class="btn-clear-history" id="clear-history" title="Clear history">🗑️</button>
+        </h3>
         <div class="history-list" id="history-list">
           <p class="history-empty">No predictions recorded yet.</p>
+        </div>
+      </div>
+
+      <!-- Model Info -->
+      <div class="panel glass-panel model-info-card" id="model-info-card">
+        <h3 class="model-info__title"><span>🧠</span> Model Information</h3>
+        <div class="model-info__content" id="model-info-content">
+          <p class="text-muted">Loading model info...</p>
         </div>
       </div>
     </aside>
   </main>
 
   <footer class="footer">
-    <span>Churn Prediction MLOps v2.0</span>
-    <span>·</span>
-    <span>FastAPI + MLflow + Docker</span>
+    <span>ChurnGuard v3.0 — Production MLOps</span>
+    <span class="footer-sep">·</span>
+    <span>FastAPI + Scikit-learn + MLflow</span>
   </footer>
 
   <script src="/frontend/app.js"></script>
 </body>
+
 </html>
